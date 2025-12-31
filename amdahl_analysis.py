@@ -84,17 +84,20 @@ def calibrer_modele(workers, temps_exp, verbose=True):
     """
     Calibre les paramètres du modèle par régression non-linéaire.
 
-    Contraintes:
-    - T_seq > 15s (temps séquentiel réaliste)
-    - C > 0.5s (overhead minimal)
+    SANS CONTRAINTES ARTIFICIELLES - laisse curve_fit trouver
+    les valeurs optimales mathématiquement.
     """
 
-    # Estimation initiale des paramètres
+    # Estimation initiale basée sur les données
+    T1 = temps_exp[0]  # T(1) = 262.39s
+    T20 = temps_exp[-1]  # T(20) ≈ 25s
+
+    # Estimation: T_seq ≈ T(N→∞), T_par ≈ T(1) - T_seq
     p0 = [20.0, 240.0, 1.0]  # T_seq, T_par, C
 
-    # Bornes des paramètres
-    # T_seq: [15, 100], T_par: [50, 500], C: [0.5, 20]
-    bounds = ([15.0, 50.0, 0.5], [100.0, 500.0, 20.0])
+    # Bornes physiques minimales (juste pour éviter les valeurs négatives)
+    # T_seq >= 0, T_par >= 0, C >= 0
+    bounds = ([0.0, 0.0, 0.0], [np.inf, np.inf, np.inf])
 
     try:
         # Régression avec scipy.optimize.curve_fit
