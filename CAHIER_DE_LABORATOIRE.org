@@ -1,0 +1,240 @@
+#+TITLE: Cahier de Laboratoire - Wordcount Distribue
+#+AUTHOR: [Votre Equipe]
+#+DATE: 2024
+#+OPTIONS: toc:2 num:t
+
+* Introduction
+
+Ce cahier de laboratoire documente toutes les experimentations realisees
+pour le projet de Makefile distribue sur Grid5000.
+
+** Informations du projet
+- Langage: Java
+- Framework: RMI (Remote Method Invocation)
+- Infrastructure: Grid5000
+- Repository: [URL du repository]
+
+** Convention
+- On n'edite jamais le passe du cahier
+- Chaque experience est documentee avec: date, SHA git, machines, scripts, resultats
+
+* Configuration de l'environnement
+
+** Installation
+#+BEGIN_SRC bash
+# Cloner le repository
+git clone [URL] wordcount-distributed
+cd wordcount-distributed
+
+# Compiler
+bash deploy/setup.sh
+#+END_SRC
+
+** Reservation Grid5000
+#+BEGIN_SRC bash
+# Reservation mono-site (exemple Nancy)
+oarsub -I -l nodes=10,walltime=2:00:00
+
+# Reservation 64 coeurs
+oarsub -I -l nodes=65,walltime=4:00:00
+#+END_SRC
+
+* Experiences
+
+** Experience 1 - Mesure Latence RMI
+*** Date: [A COMPLETER]
+*** Git SHA: [A COMPLETER]
+*** Objectif
+Mesurer les parametres L_rmi (latence lookup) et o_rmi (overhead appel)
+du modele LogP pour calibrer le modele theorique.
+
+*** Machines utilisees
+- Master: [hostname]
+- Workers: [liste des hostnames]
+- Site Grid5000: [site]
+
+*** Script execute
+#+BEGIN_SRC bash
+cd ~/wordcount-distributed
+export PROJECT_DIR=$PWD
+bash benchmarks/run_rmi_benchmark.sh
+#+END_SRC
+
+*** Resultats
+- Fichier: benchmarks/results/rmi/rmi_summary_[TIMESTAMP].csv
+- L_rmi moyen: [X.XX] ms
+- o_rmi moyen: [X.XX] ms
+
+*** Observations
+[Notes sur les anomalies, problemes rencontres, etc.]
+
+
+** Experience 2 - Mesure Vitesse Wordcount
+*** Date: [A COMPLETER]
+*** Git SHA: [A COMPLETER]
+*** Objectif
+Mesurer le parametre V_wc (vitesse de calcul en lignes/seconde)
+pour calibrer le modele theorique.
+
+*** Machines utilisees
+- Machine: [hostname]
+- Site Grid5000: [site]
+
+*** Script execute
+#+BEGIN_SRC bash
+cd ~/wordcount-distributed
+export PROJECT_DIR=$PWD
+bash benchmarks/run_wordcount_benchmark.sh
+#+END_SRC
+
+*** Resultats
+- Fichier: benchmarks/results/compute/wordcount_stats_[TIMESTAMP].csv
+- V_wc moyen: [X] lignes/seconde
+
+*** Observations
+[Notes]
+
+
+** Experience 3 - Mesure Transfert SCP/NFS
+*** Date: [A COMPLETER]
+*** Git SHA: [A COMPLETER]
+*** Objectif
+Mesurer les parametres de communication:
+- L_scp, BW_scp: latence et bande passante SCP
+- L_nfs, BW_nfs: latence et bande passante NFS
+
+*** Machines utilisees
+- Source: [hostname]
+- Destination: [hostname]
+- Site Grid5000: [site]
+
+*** Script execute
+#+BEGIN_SRC bash
+cd ~/wordcount-distributed
+export PROJECT_DIR=$PWD
+bash benchmarks/run_transfer_benchmark.sh
+#+END_SRC
+
+*** Resultats
+- Fichier: benchmarks/results/transfer/transfer_params_[TIMESTAMP].txt
+- L_scp: [X.XX] ms
+- BW_scp: [X.XX] MB/s
+- L_nfs: [X.XX] ms
+- BW_nfs: [X.XX] MB/s
+
+*** Observations
+[Notes sur la difference SCP vs NFS]
+
+
+** Experience 4 - Mesure Initialisation Cluster
+*** Date: [A COMPLETER]
+*** Git SHA: [A COMPLETER]
+*** Objectif
+Mesurer les parametres alpha et beta du modele d'initialisation:
+T_init(n) = alpha * n + beta
+
+*** Machines utilisees
+- Noeuds: [nombre] noeuds
+- Site Grid5000: [site]
+
+*** Script execute
+#+BEGIN_SRC bash
+cd ~/wordcount-distributed
+export PROJECT_DIR=$PWD
+bash benchmarks/run_init_benchmark.sh
+#+END_SRC
+
+*** Resultats
+- Fichier: benchmarks/results/init/init_params_[TIMESTAMP].txt
+- alpha: [X.XXXX] secondes/worker
+- beta: [X.XXXX] secondes
+- R^2: [X.XXXX]
+
+*** Observations
+[Notes]
+
+
+** Experience 5 - Calibration du Modele
+*** Date: [A COMPLETER]
+*** Git SHA: [A COMPLETER]
+*** Objectif
+Calibrer le modele theorique a partir des mesures precedentes.
+
+*** Script execute
+#+BEGIN_SRC bash
+cd ~/wordcount-distributed
+python3 benchmarks/calibrate_model.py --results-dir benchmarks/results --output model/model_config.ini
+#+END_SRC
+
+*** Resultats
+- Fichier: model/model_config.ini
+- Parametres calibres: [voir fichier]
+
+*** Observations
+[Notes]
+
+
+** Experience 6 - Validation sur 64 Coeurs
+*** Date: [A COMPLETER]
+*** Git SHA: [A COMPLETER]
+*** Objectif
+Valider le modele theorique en comparant les predictions
+avec les mesures reelles sur des configurations de 1 a 64 workers.
+
+*** Machines utilisees
+- Noeuds: 65 (1 master + 64 workers)
+- Site Grid5000: [site]
+
+*** Script execute
+#+BEGIN_SRC bash
+cd ~/wordcount-distributed
+export PROJECT_DIR=$PWD
+bash benchmarks/validate_model.sh
+#+END_SRC
+
+*** Resultats
+- Fichier: benchmarks/results/validation/validation_[TIMESTAMP].csv
+
+| Workers | T_predit (s) | T_mesure (s) | Erreur (%) |
+|---------+--------------+--------------+------------|
+|       1 |              |              |            |
+|       2 |              |              |            |
+|       4 |              |              |            |
+|       8 |              |              |            |
+|      16 |              |              |            |
+|      32 |              |              |            |
+|      64 |              |              |            |
+
+*** Observations
+[Analyse des resultats, facteurs limitants identifies]
+
+
+* Analyse des Resultats
+
+** Acceleration (Speedup)
+[A COMPLETER avec les courbes]
+
+** Efficacite
+[A COMPLETER avec les courbes]
+
+** Facteurs Limitants
+[A COMPLETER]
+
+** Comparaison Modele vs Realite
+[A COMPLETER]
+
+* Problemes Rencontres
+
+** Probleme 1: [Description]
+*** Date: [DATE]
+*** Description
+[Description du probleme]
+*** Solution
+[Solution appliquee]
+
+* References
+
+- Graham, R.L. (1969). "Bounds on Multiprocessing Timing Anomalies". SIAM Journal on Applied Mathematics.
+- Culler et al. (1993). "LogP: A Practical Model of Parallel Computation". Communications of the ACM.
+- Amdahl, G.M. (1967). "Validity of the single processor approach". AFIPS Conference Proceedings.
+- Valiant, L.G. (1990). "A Bridging Model for Parallel Computation". Communications of the ACM.
